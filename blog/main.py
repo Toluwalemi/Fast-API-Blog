@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import FastAPI, Depends, status, Response, HTTPException
 from sqlalchemy.orm import Session
 
@@ -19,10 +21,9 @@ def create_blog_post(request: schemas.Blog, db: Session = Depends(get_db)):
     return new_blog
 
 
-@app.get('/blog')
+@app.get('/blog', response_model=List[schemas.ShowBlog])
 def get_all_posts(db: Session = Depends(get_db)):
-    blogs = db.query(models.Blog).all()
-    return blogs
+    return db.query(models.Blog).all()
 
 
 @app.delete('/blog/{id}', status_code=status.HTTP_204_NO_CONTENT)
@@ -49,7 +50,7 @@ def update(id, request: schemas.Blog, db: Session = Depends(get_db)):
     return 'updated'
 
 
-@app.get('/blog/{id}', status_code=200)
+@app.get('/blog/{id}', status_code=200, response_model=schemas.ShowBlog)
 def get_single_id(id, response: Response, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if not blog:
