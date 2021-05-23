@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from blog import schemas, models
-from blog.helpers.db_helpers import get_db, bcrypt
+from blog import schemas
+from blog.helpers.db_helpers import get_db
+from blog.helpers.user_helper import create_user_helper, get_user_helper
 
 router = APIRouter(
     prefix="/user",
@@ -12,18 +13,9 @@ router = APIRouter(
 
 @router.post('/', response_model=schemas.ShowUser, tags=["users"])
 def create_user(request: schemas.User, db: Session = Depends(get_db)):
-    new_user = models.User(name=request.name, email=request.email, password=bcrypt(request.password))
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
+    return create_user_helper(request, db)
 
 
 @router.get('/{id}', response_model=schemas.ShowUser, tags=["users"])
 def get_user(id: int, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.id == id).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Blog with the id {id} is not available")
-
-    return user
+    return get_user_helper(id, db)

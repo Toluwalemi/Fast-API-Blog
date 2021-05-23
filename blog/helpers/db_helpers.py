@@ -13,5 +13,3 @@ def get_db():
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def bcrypt(password: str):
-    return pwd_context.hash(password)
