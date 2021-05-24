@@ -5,6 +5,7 @@ from blog import models
 from blog.helpers.db_helpers import get_db
 from blog.helpers.hashing import verify
 from blog.schemas import Login
+from blog.token import create_access_token
 
 router = APIRouter(
     tags=['authentication']
@@ -20,5 +21,7 @@ def login(request: Login, db: Session = Depends(get_db)):
     if not verify(user.password, request.password):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Incorrect password")
-    # generate jwt token
-    return user
+    access_token = create_access_token(
+        data={"sub": user.email}
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
