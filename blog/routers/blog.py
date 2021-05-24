@@ -30,7 +30,7 @@ def destroy(id, db: Session = Depends(get_db)):
 
 @router.put('/{id}', status_code=status.HTTP_202_ACCEPTED, tags=["blogs"])
 def update(id, request: schemas.Blog, db: Session = Depends(get_db)):
-    return update_helper(id, db)
+    return update_helper(id, request, db)
 
 
 @router.get('/{id}', status_code=200, response_model=schemas.ShowBlog, tags=["blogs"])
